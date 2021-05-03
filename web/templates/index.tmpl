@@ -13,23 +13,25 @@
     <h1>Kernel.org Transparency Log Monitor</title>
   </header>
   <article>
-  <p>This webpage is a monitor of the kernel.org transparency log for git-recieve operations. This service scans the
-  transparency log every NN minutes and attempts to validate the attached signatures. The goal is to ensure all code
+  <p>This webpage is a monitor of the kernel.org transparency log for git-receive operations. This service scans the
+  transparency log every 60 minutes and attempts to validate the attached signatures. The goal is to ensure all code
   pushes to kernel.org repositories can be traced back to some operation on the transparency log.</p>
 
   <p>This ensures server compromises where an malicious actor with direct access to the git repository can't insert commits
   without it being apparent through a missing push operation on the log. Attacks similar to the attempted PHP backdoor
-  gets harder to sucsessfully accomplish as a result.</p>
+  gets harder to successfully accomplish as a result.</p>
 
   <p><a href="https://korg.docs.kernel.org/gitolite/transparency-log.html">https://korg.docs.kernel.org/gitolite/transparency-log.html</a><br>
   <a href="https://arstechnica.com/gadgets/2021/03/hackers-backdoor-php-source-code-after-breaching-internal-git-server/">https://arstechnica.com/gadgets/2021/03/hackers-backdoor-php-source-code-after-breaching-internal-git-server/</a></p>
 
 
   <p>Please note that not all operations are signed and the service is still a work in progress. Any invalid signatures
-  are most likely the fault of the operator :)</p>
+  are most likely the fault of the operator :) <br>
+  Code can be found on <a
+                           href="https://github.com/Foxboron/kernel.org-git-verifier">https://github.com/Foxboron/kernel.org-git-verifier</a></p>
   <section>
     <strong>Symbols in the table:</strong> <br>
-    <div class="green">✔️</div> Valid Signature &nbsp; <div class="red">✖️</div> Invalid Singature  &nbsp; <div class="yellow">❓</div> Unknown issuer  &nbsp; <div class="yellow">➖</div> No signature &nbsp;
+    <div class="green">✔️</div> Valid Signature &nbsp; <div class="red">✖️</div> Invalid Signature &nbsp; <div class="yellow">❓</div> Unknown issuer  &nbsp; <div class="yellow">➖</div> No signature &nbsp;
   </section>
   </br>
   <section>
