@@ -129,7 +129,12 @@ func (p *PushCert) Verify(keyring openpgp.KeyRing) (*openpgp.Entity, error) {
 	file := bytes.NewBuffer(nil)
 	p.EncodeWithoutCert(file)
 	s := bytes.NewReader(p.GPGSignature)
-	ent, err := openpgp.CheckArmoredDetachedSignature(keyring, file, s, nil)
+	// Because CLOCKS ARE AMAZING:
+	// The signature *might* be in the future, thus we need to add 5 minutes to the date
+	// TODO: If signatures fail, check this.
+	rounded := time.Date(p.Timestamp.Year(),
+		p.Timestamp.Month(), p.Timestamp.Day(), p.Timestamp.Hour(), p.Timestamp.Minute()+5, 0, 0, p.Timestamp.Location())
+	ent, err := openpgp.CheckArmoredDetachedSignature(keyring, file, s, &packet.Config{Time: rounded.Local})
 	if err != nil {
 		return nil, err
 	}
