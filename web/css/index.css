@@ -1,8 +1,8 @@
-body{
+body {
     font: monospace;
 }
 
-body {
+header, article{
     width: 60%;
     margin-left: auto;
     margin-right: auto;
@@ -12,9 +12,9 @@ section article {
     margin: 0 auto;
 }
 
-.styled-table {
+table {
     border-collapse: collapse;
-    max-width: auto;
+    width: 100%;
 }
 
 .styled-table thead tr {

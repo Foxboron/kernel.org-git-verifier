@@ -12,7 +12,6 @@
   <header>
     <h1>Kernel.org Transparency Log Monitor</title>
   </header>
-
   <article>
   <p>This webpage is a monitor of the kernel.org transparency log for git-recieve operations. This service scans the
   transparency log every NN minutes and attempts to validate the attached signatures. The goal is to ensure all code
@@ -22,13 +21,12 @@
   without it being apparent through a missing push operation on the log. Attacks similar to the attempted PHP backdoor
   gets harder to sucsessfully accomplish as a result.</p>
 
-  <p>https://korg.docs.kernel.org/gitolite/transparency-log.html<br>
-  https://arstechnica.com/gadgets/2021/03/hackers-backdoor-php-source-code-after-breaching-internal-git-server/</p>
+  <p><a href="https://korg.docs.kernel.org/gitolite/transparency-log.html">https://korg.docs.kernel.org/gitolite/transparency-log.html</a><br>
+  <a href="https://arstechnica.com/gadgets/2021/03/hackers-backdoor-php-source-code-after-breaching-internal-git-server/">https://arstechnica.com/gadgets/2021/03/hackers-backdoor-php-source-code-after-breaching-internal-git-server/</a></p>
 
 
   <p>Please note that not all operations are signed and the service is still a work in progress. Any invalid signatures
   are most likely the fault of the operator :)</p>
-  </article>
   <section>
     <strong>Symbols in the table:</strong> <br>
     <div class="green">✔️</div> Valid Signature &nbsp; <div class="red">✖️</div> Invalid Singature  &nbsp; <div class="yellow">❓</div> Unknown issuer  &nbsp; <div class="yellow">➖</div> No signature &nbsp;
@@ -36,18 +34,21 @@
   </br>
   <section>
     <strong>Filter list:</strong> <br>
-    Invalid Signatures &nbsp; 
-    Valid Signatures &nbsp; 
-    Unknown Issuer &nbsp; 
-    Unsigned &nbsp; 
+    <a href="/">Index</a> &nbsp;
+    <a href="/signed">Valid Signatures</a> &nbsp;
+    <a href="/unsigned">Unsigned</a> &nbsp;
+    <a href="/unknown">Unknown Issuer</a> &nbsp;
+    <a href="/invalid">Invalid Signatures</a> &nbsp;
   </section>
   </br>
+  </article>
   <section>
   <table class="styled-table">
     <thead>
         <tr>
             <th>Signature</th>
             <th>User</th>
+            <th>Timestamp</th>
             <th>Commit Message</th>
             <th>Commit</th>
             <th>Signature From</th>
@@ -58,15 +59,16 @@
         <tr>
           <td> {{- if (and .Signature .Valid) -}}
             <div class="green">✔️</div>
-          {{- else if (and .Signature (not .Valid)) -}}
-            <div class="red">✖️</div>
           {{- else if (and .Signature .Unknown) -}}
             <div class="yellow">❓</div>
+          {{- else if (and .Signature (not .Valid)) -}}
+            <div class="red">✖️</div>
           {{- else if (not .Signature) -}}
             <div class="yellow">➖</div>
           {{- end -}}
             </td>
           <td>{{.User}}</td>
+          <td>{{.CommitDate}}</td>
           <td>{{.CommitMsg}}</td>
           <td>{{printf "%.25s" .Commit}}</td>
           <td>{{.SigIssuer}}</td>

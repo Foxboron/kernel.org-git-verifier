@@ -52,7 +52,7 @@ func (tr *TlogRepo) Pull() error {
 	return nil
 }
 
-func (tr *TlogRepo) LogSince(since *time.Time, fn func(r io.Reader) error) error {
+func (tr *TlogRepo) LogSince(since *time.Time, fn func(c *object.Commit, r io.Reader) error) error {
 	cIter, err := tr.Git.Log(&git.LogOptions{Since: since})
 	if err != nil {
 		return err
@@ -68,7 +68,7 @@ func (tr *TlogRepo) LogSince(since *time.Time, fn func(r io.Reader) error) error
 			return err
 		}
 		r := strings.NewReader(blob)
-		if err := fn(r); err != nil {
+		if err := fn(c, r); err != nil {
 			return err
 		}
 		return nil

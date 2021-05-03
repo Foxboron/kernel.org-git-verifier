@@ -14,14 +14,15 @@ var db *gorm.DB
 
 // These are the commits from the transparency logs
 type TLogCommit struct {
-	Commit    string `gorm:"primaryKey"`
-	CommitMsg string
-	User      string
-	SigIssuer string
-	Valid     bool       `gorm:"default:false"`
-	Signature bool       `gorm:"default:false"`
-	Unknown   bool       `gorm:"default:false"`
-	Revisions []Revision `gorm:"foreignKey:Commit"`
+	Commit     string `gorm:"primaryKey"`
+	CommitMsg  string
+	CommitDate time.Time
+	User       string
+	SigIssuer  string
+	Valid      bool       `gorm:"default:false"`
+	Signature  bool       `gorm:"default:false"`
+	Unknown    bool       `gorm:"default:false"`
+	Revisions  []Revision `gorm:"foreignKey:Commit"`
 }
 
 type TLogCommits []TLogCommit

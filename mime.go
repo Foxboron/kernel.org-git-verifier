@@ -19,7 +19,7 @@ type MimeFile struct {
 	Content  []byte
 }
 
-type MimeFiles map[string][]byte
+type MimeFiles []MimeFile
 
 func BuildFileName(part *multipart.Part, radix string, index int) (filename string) {
 	filename = part.FileName()
@@ -61,7 +61,12 @@ func WritePart(part *multipart.Part) []byte {
 	return nil
 }
 
-func ParsePart(out MimeFiles, mime_data io.Reader, boundary string, index int) {
+func ParsePart(out *MimeFiles, mime_data io.Reader, boundary string, index int) {
+	if boundary == "" {
+		bytes, _ := io.ReadAll(mime_data)
+		*out = append(*out, MimeFile{Filename: "file", Content: bytes})
+		return
+	}
 	reader := multipart.NewReader(mime_data, boundary)
 	if reader == nil {
 		return
@@ -78,7 +83,7 @@ func ParsePart(out MimeFiles, mime_data io.Reader, boundary string, index int) {
 			ParsePart(out, new_part, params["boundary"], index+1)
 		} else {
 			filename := BuildFileName(new_part, boundary, 1)
-			out[filename] = WritePart(new_part)
+			*out = append(*out, MimeFile{Filename: filename, Content: WritePart(new_part)})
 		}
 	}
 }
@@ -92,7 +97,7 @@ func ParseMail(r io.Reader) (MimeFiles, error) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	files := make(MimeFiles)
-	ParsePart(files, m.Body, params["boundary"], 1)
+	var files MimeFiles
+	ParsePart(&files, m.Body, params["boundary"], 1)
 	return files, nil
 }

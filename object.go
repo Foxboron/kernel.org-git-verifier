@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/ProtonMail/go-crypto/openpgp"
+	"github.com/ProtonMail/go-crypto/openpgp/packet"
 )
 
 // This should be upstreamed to go-git
@@ -90,12 +91,23 @@ func DecodePushCertbuf(buf []byte) (*PushCert, error) {
 		case "nonce":
 			pc.Nonce = split[1]
 		case "":
-			line, err := r.ReadBytes('\n')
-			if err != nil {
-				return nil, fmt.Errorf("can't parse push-cert protocol, Newline?: %w", err)
+			var buf []byte
+			for {
+				b, err := r.Peek(5)
+				if err != nil {
+					break
+				}
+				// Breka if we see a signature
+				if bytes.Equal(b, []byte("-----")) {
+					break
+				}
+				line, err = r.ReadBytes('\n')
+				if errors.Is(err, io.EOF) {
+					break
+				}
+				buf = append(buf, line...)
 			}
-			line = bytes.TrimSpace(line)
-			pc.Protocol = line
+			pc.Protocol = buf
 		}
 	}
 	return pc, nil
@@ -103,7 +115,7 @@ func DecodePushCertbuf(buf []byte) (*PushCert, error) {
 
 func (p *PushCert) encode(w io.Writer, includeSig bool) error {
 	t := fmt.Sprintf("%d %s", p.Timestamp.Unix(), p.Timestamp.Format("-0700"))
-	tmpl := "certificate version %s\npusher %s %s\npushee %s\nnonce %s\n\n%s\n"
+	tmpl := "certificate version %s\npusher %s %s\npushee %s\nnonce %s\n\n%s"
 	if _, err := fmt.Fprintf(w, tmpl,
 		p.Version, p.Pusher, t, p.Pushee, p.Nonce, p.Protocol); err != nil {
 		return err
@@ -125,16 +137,22 @@ func (p *PushCert) EncodeWithoutCert(w io.Writer) error {
 }
 
 // Verify the content of the cert towards a pgp keyring
-func (p *PushCert) Verify(keyring openpgp.KeyRing) (*openpgp.Entity, error) {
+func (p *PushCert) Verify(keyring openpgp.KeyRing) (ent *openpgp.Entity, err error) {
 	file := bytes.NewBuffer(nil)
 	p.EncodeWithoutCert(file)
 	s := bytes.NewReader(p.GPGSignature)
 	// Because CLOCKS ARE AMAZING:
 	// The signature *might* be in the future, thus we need to add 5 minutes to the date
 	// TODO: If signatures fail, check this.
-	rounded := time.Date(p.Timestamp.Year(),
-		p.Timestamp.Month(), p.Timestamp.Day(), p.Timestamp.Hour(), p.Timestamp.Minute()+5, 0, 0, p.Timestamp.Location())
-	ent, err := openpgp.CheckArmoredDetachedSignature(keyring, file, s, &packet.Config{Time: rounded.Local})
+	jitter := 5
+	roundedUp := time.Date(p.Timestamp.Year(),
+		p.Timestamp.Month(), p.Timestamp.Day(), p.Timestamp.Hour(), p.Timestamp.Minute()+jitter, 0, 0, p.Timestamp.Location())
+	// The extra code is incase we need to add jitter to round up and down :/
+	// Might not need it!
+	// roundedDown := time.Date(p.Timestamp.Year(),
+	// 	p.Timestamp.Month(), p.Timestamp.Day(), p.Timestamp.Hour(), p.Timestamp.Minute()-jitter, 0, 0, p.Timestamp.Location())
+	// for _, _ = range []time.Time{p.Timestamp, roundedUp, roundedDown} {
+	ent, err = openpgp.CheckArmoredDetachedSignature(keyring, file, s, &packet.Config{Time: roundedUp.Local})
 	if err != nil {
 		return nil, err
 	}

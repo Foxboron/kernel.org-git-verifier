@@ -7,6 +7,8 @@ import (
 	"github.com/ProtonMail/go-crypto/openpgp"
 )
 
+var Keyring openpgp.EntityList
+
 // Get a single keyring from file
 func GetKey(path string) (openpgp.EntityList, error) {
 	f, err := os.Open(path)
@@ -23,7 +25,7 @@ func GetKey(path string) (openpgp.EntityList, error) {
 // This walks over a keyring directory and fetches our known kernel developer keys
 func GetKeyring() (openpgp.EntityList, error) {
 	var ent []*openpgp.Entity
-	if err := filepath.Walk("keyring", func(path string, info os.FileInfo, err error) error {
+	if err := filepath.Walk("pgpkeys/keys", func(path string, info os.FileInfo, err error) error {
 		if info.IsDir() {
 			return nil
 		}
@@ -40,4 +42,8 @@ func GetKeyring() (openpgp.EntityList, error) {
 		return ent, err
 	}
 	return ent, nil
+}
+
+func init() {
+	Keyring, _ = GetKeyring()
 }

@@ -12,15 +12,11 @@ import (
 )
 
 func VerifyPushCert(content []byte) (string, error) {
-	keyring, err := GetKeyring()
-	if err != nil {
-		return "", err
-	}
 	p, err := DecodePushCertbuf(content)
 	if err != nil {
 		return "", err
 	}
-	ent, err := p.Verify(keyring)
+	ent, err := p.Verify(Keyring)
 	if err != nil {
 		return "", err
 	}
