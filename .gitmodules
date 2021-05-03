@@ -1,0 +1,3 @@
+[submodule "pgpkeys"]
+	path = pgpkeys
+	url = https://kernel.googlesource.com/pub/scm/docs/kernel/pgpkeys.git
