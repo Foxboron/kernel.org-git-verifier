@@ -1,57 +1,145 @@
+main,
+header {
+  max-width: 1200px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+h2 {
+  margin-top: 2.5rem;
+}
+
 body {
-    font: monospace;
+  font: monospace;
 }
 
-header, article{
-    width: 60%;
-    margin-left: auto;
-    margin-right: auto;
+p {
+  line-height: 1.2rem;
+  max-width: 75ch;
 }
 
-section article {
-    margin: 0 auto;
+ul {
+  list-style: none;
+  padding-inline-start: 0;
 }
 
+article {
+  margin-bottom: 2rem;
+}
+
+nav ul,
+section dl {
+  display: flex;
+  align-items: center;
+}
+
+dd {
+  margin-inline-start: 0;
+}
+
+section dl dt {
+  padding-right: 0.5rem;
+}
+
+section dl dd {
+  padding-right: 2rem;
+}
+
+nav {
+  margin-bottom: 1.5rem;
+}
+
+nav ul {
+  flex-wrap: wrap;
+}
+
+nav ul li {
+  padding-right: 1rem;
+}
+
+nav ul li a {
+  display: block;
+  text-decoration: none;
+  color: black;
+  background-color: #ddd;
+  padding: 0.25rem 0.5rem;
+  border-radius: 3px;
+}
+
+nav ul li a[aria-current="page"] {
+  background-color: #111;
+  color: #fff;
+}
+
+nav ul li a:hover {
+  text-decoration: underline;
+}
 table {
-    border-collapse: collapse;
-    width: 100%;
+  border-collapse: collapse;
+  width: 100%;
 }
 
-.styled-table thead tr {
-    text-align: left;
-    border-bottom: 1px solid #dadce0;
+tr {
+  text-align: left;
+  border-bottom: 1px solid #dadce0;
 }
 
-.styled-table th,
-.styled-table td {
-    padding: 12px 15px;
+th,
+td {
+  padding: 0.75rem 1rem;
 }
 
-.styled-table tbody tr {
-    border-bottom: 1px solid #dadce0;
+td label {
+  display: none;
 }
 
-.styled-table tbody tr.active-row {
-    font-weight: bold;
-    color: #009879;
-}
-
-div {
-  display: inline;
-}
-
-.yellow{
+.yellow {
   font-size: 20px;
   color: transparent;
   text-shadow: 0 0 0 orange;
 }
-.red{
+.red {
   font-size: 20px;
   color: transparent;
   text-shadow: 0 0 0 red;
 }
-.green{
+.green {
   font-size: 20px;
   color: transparent;
   text-shadow: 0 0 0 green;
+}
+
+@media screen and (max-width: 768px) {
+  section dl {
+    display: grid;
+    grid-template-columns: auto 1fr;
+  }
+
+  nav ul li {
+    margin-top: 0.5rem;
+  }
+
+  table {
+    display: block;
+  }
+
+  table thead {
+    display: none;
+  }
+
+  table tr {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  table tr td:first-child {
+    position: absolute;
+    right: 0;
+  }
+
+  table tr td label {
+    display: block;
+    font-weight: 800;
+  }
 }

@@ -11,9 +11,19 @@ import (
 	"gorm.io/gorm/clause"
 )
 
+var Urls = map[string]string{
+	"/":         "Index",
+	"/signed":   "Valid Signatures",
+	"/unsigned": "Unsigned",
+	"/unknown":  "Unknown Issuer",
+	"/invalid":  "Invalid Signatures",
+}
+
 func RenderTmpl(c *gin.Context, entries *[]TLogCommit) {
 	c.HTML(http.StatusOK, "index.tmpl", gin.H{
 		"entries": entries,
+		"urls":    Urls,
+		"active":  c.FullPath(),
 	})
 }
 
