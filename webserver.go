@@ -29,31 +29,31 @@ func RenderTmpl(c *gin.Context, entries *[]TLogCommit) {
 
 func RenderIndex(c *gin.Context) {
 	var entry []TLogCommit
-	db.Limit(200).Find(&entry)
+	db.Order("commit_date desc").Limit(200).Find(&entry)
 	RenderTmpl(c, &entry)
 }
 
 func RenderInvalid(c *gin.Context) {
 	var entry []TLogCommit
-	db.Limit(200).Where("\"unknown\" = ? and \"signature\" = ? and \"valid\" = ?", false, true, false).Find(&entry)
+	db.Order("commit_date desc").Limit(200).Where("\"unknown\" = ? and \"signature\" = ? and \"valid\" = ?", false, true, false).Find(&entry)
 	RenderTmpl(c, &entry)
 }
 
 func RenderSigned(c *gin.Context) {
 	var entry []TLogCommit
-	db.Limit(200).Where("\"valid\" = ?", true).Find(&entry)
+	db.Order("commit_date desc").Limit(200).Where("\"valid\" = ?", true).Find(&entry)
 	RenderTmpl(c, &entry)
 }
 
 func RenderUnsigned(c *gin.Context) {
 	var entry []TLogCommit
-	db.Limit(200).Where("\"signature\" = ?", false).Find(&entry)
+	db.Order("commit_date desc").Limit(200).Where("\"signature\" = ?", false).Find(&entry)
 	RenderTmpl(c, &entry)
 }
 
 func RenderUnknown(c *gin.Context) {
 	var entry []TLogCommit
-	db.Where("\"unknown\" = ?", true).Find(&entry)
+	db.Order("commit_date desc").Where("\"unknown\" = ?", true).Find(&entry)
 	RenderTmpl(c, &entry)
 }
 
