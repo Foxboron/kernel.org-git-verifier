@@ -22,7 +22,7 @@ type TLogCommit struct {
 	Valid      bool       `gorm:"default:false"`
 	Signature  bool       `gorm:"default:false"`
 	Unknown    bool       `gorm:"default:false"`
-	Revisions  []Revision `gorm:"foreignKey:Commit"`
+	Revisions  []Revision `gorm:"foreignKey:TLogCommitID"`
 }
 
 type TLogCommits []TLogCommit
@@ -36,10 +36,11 @@ func AddCommits(c TLogCommits) {
 }
 
 type Revision struct {
-	Commit     string `gorm:"primaryKey"`
-	Who        string
-	Repository string
-	TLogCommit TLogCommit `gorm:"foreignKey:Commit"`
+	Commit       string `gorm:"primaryKey"`
+	Who          string
+	Repository   string
+	TLogCommitID string
+	TLogCommit   TLogCommit
 }
 
 func AddRevision(c *TLogCommit) {
