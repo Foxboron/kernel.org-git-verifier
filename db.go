@@ -8,6 +8,7 @@ import (
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
+	"gorm.io/gorm/logger"
 )
 
 var db *gorm.DB
@@ -28,11 +29,11 @@ type TLogCommit struct {
 type TLogCommits []TLogCommit
 
 func AddCommit(c *TLogCommit) {
-	db.Create(c)
+	db.Session(&gorm.Session{CreateBatchSize: 300}).Create(c)
 }
 
 func AddCommits(c TLogCommits) {
-	db.Create(&c)
+	db.Session(&gorm.Session{CreateBatchSize: 300}).Create(&c)
 }
 
 type Revision struct {
@@ -71,7 +72,15 @@ func LastTimestamp() (time.Time, error) {
 
 func InitDB(name string) {
 	var err error
-	db, err = gorm.Open(sqlite.Open(name), &gorm.Config{})
+	Default := logger.New(log.New(os.Stdout, "\r\n", log.LstdFlags), logger.Config{
+		SlowThreshold:             200 * time.Millisecond,
+		LogLevel:                  logger.Error,
+		IgnoreRecordNotFoundError: false,
+		Colorful:                  true,
+	})
+	db, err = gorm.Open(sqlite.Open(name), &gorm.Config{
+		Logger: Default,
+	})
 	db.AutoMigrate(&TLogCommit{}, &Revision{}, &Scan{})
 	if err != nil {
 		log.Fatal(err)
