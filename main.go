@@ -18,6 +18,11 @@ var (
 	Unsigned = 0
 )
 
+var (
+	ctxBck      = context.Background()
+	ctx, cancel = context.WithCancel(ctxBck)
+)
+
 func ScrapeTLog() {
 	r, err := GetRepo()
 	if err != nil {
@@ -30,7 +35,6 @@ func ScrapeTLog() {
 		t = time.Date(2020, 1, 1, 1, 1, 1, 0, time.UTC)
 	}
 	counter := 0
-	var segment []TLogCommit
 	r.LogSince(&t,
 		func(c *object.Commit, r io.Reader) error {
 			files, err := ParseMail(r)
@@ -40,22 +44,17 @@ func ScrapeTLog() {
 			checksum := fmt.Sprintf("%s", c.Hash)
 			tlog := WorkTLog(checksum, files)
 			tlog.CommitMsg = c.Message
-			log.Debug("added commit")
-			log.WithFields(log.Fields{
-				"message":  c.Message,
-				"checksum": checksum,
-			}).Info("Added commit")
 			tlog.CommitDate = c.Author.When
-			segment = append(segment, *tlog)
+			AddCommit(tlog)
 			counter += 1
-			if counter%10 == 0 {
-				AddCommits(segment)
-				segment = []TLogCommit{}
+			if counter%100 == 0 {
+				log.WithFields(log.Fields{
+					"counter": counter,
+				}).Info("Added commits")
 			}
 			return nil
 		},
 	)
-	AddCommits(segment) // Add remaining
 	t = time.Now()
 	AddScan(&Scan{t, counter})
 	log.WithFields(log.Fields{
