@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"strings"
 
 	pgperrors "github.com/ProtonMail/go-crypto/openpgp/errors"
@@ -47,7 +48,10 @@ func RevlistParser(revlist io.Reader) [][]byte {
 
 func WorkRevisions(files MimeFiles) (string, []Revision) {
 	var wc []Revision
-	entry, _ := DecodeTLogEntry(bytes.NewReader(files[0].Content))
+	entry, err := DecodeTLogEntry(bytes.NewReader(files[0].Content))
+	if err != nil {
+		log.Fatal(err)
+	}
 	var r io.Reader
 	for _, change := range entry.Changes {
 		// If there is a revision list we find that instead
@@ -55,15 +59,19 @@ func WorkRevisions(files MimeFiles) (string, []Revision) {
 			for _, f := range files {
 				if f.Filename == change.Log {
 					r = bytes.NewBuffer(f.Content)
+					revlist := RevlistParser(r)
+					for _, rev := range revlist {
+						wc = append(wc, Revision{Who: entry.User, Repository: entry.Repo, Commit: fmt.Sprintf("%s", rev)})
+					}
 				}
 			}
 		} else {
 			r = strings.NewReader(change.Log)
+			revlist := RevlistParser(r)
+			for _, rev := range revlist {
+				wc = append(wc, Revision{Who: entry.User, Repository: entry.Repo, Commit: fmt.Sprintf("%s", rev)})
+			}
 		}
-	}
-	revlist := RevlistParser(r)
-	for _, rev := range revlist {
-		wc = append(wc, Revision{Who: entry.User, Repository: entry.Repo, Commit: fmt.Sprintf("%s", rev)})
 	}
 	return entry.User, wc
 }
