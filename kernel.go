@@ -9,9 +9,7 @@ import (
 	"gorm.io/gorm/clause"
 )
 
-func GetLinuxRepo() {
-	earliest := "v5.14"
-	latest := "HEAD"
+func GetLinuxRepo(earliest, latest string) {
 	c := fmt.Sprintf("-C ./linux log --pretty=format:%%H %s..%s", earliest, latest)
 	cmd := exec.Command("git", strings.Split(c, " ")...)
 	stdout, err := cmd.Output()

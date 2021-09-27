@@ -95,11 +95,18 @@ func Timers(ctx context.Context, cancel context.CancelFunc) {
 }
 
 func main() {
-	ctx := context.Background()
-	ctx, cancel := context.WithCancel(ctx)
-	CancelSignal(ctx, cancel)
-	Timers(ctx, cancel)
-	webpage(ctx)
-	<-ctx.Done()
-	// CheckCommit(os.Args[1])
+	if len(os.Args) == 1 {
+		CancelSignal(ctx, cancel)
+		Timers(ctx, cancel)
+		webpage(ctx)
+		<-ctx.Done()
+	}
+	switch os.Args[1] {
+	case "check":
+		if len(os.Args) != 4 {
+			fmt.Println("check <from> <until>")
+			return
+		}
+		GetLinuxRepo(os.Args[2], os.Args[3])
+	}
 }
