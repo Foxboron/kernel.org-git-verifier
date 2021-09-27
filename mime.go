@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"mime"
 	"mime/multipart"
 	"mime/quotedprintable"
@@ -91,11 +90,11 @@ func ParsePart(out *MimeFiles, mime_data io.Reader, boundary string, index int) 
 func ParseMail(r io.Reader) (MimeFiles, error) {
 	m, err := mail.ReadMessage(r)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	_, params, err := mime.ParseMediaType(m.Header.Get("Content-Type"))
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	var files MimeFiles
 	ParsePart(&files, m.Body, params["boundary"], 1)
